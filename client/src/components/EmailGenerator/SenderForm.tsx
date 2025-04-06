@@ -33,6 +33,10 @@ export function SenderForm({ onSubmit }: SenderFormProps) {
       name: "",
       company: "",
       productDescription: "",
+      email: "",
+      phone: "",
+      website: "",
+      position: "",
     },
   });
 
@@ -105,6 +109,71 @@ export function SenderForm({ onSubmit }: SenderFormProps) {
               </FormItem>
             )}
           />
+
+          <div className="border-t border-gray-200 pt-4 mt-4">
+            <h4 className="text-md font-medium mb-3">Contact Information</h4>
+            <p className="text-xs text-gray-500 mb-3">This contact information may be included in your email signature</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={senderForm.control}
+                name="position"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Position</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Sales Manager" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={senderForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="you@example.com" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <FormField
+                control={senderForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+1 (555) 123-4567" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={senderForm.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Website</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://yourcompany.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
 
           <Form {...emailSettingsForm}>
             <FormField

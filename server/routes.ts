@@ -123,13 +123,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         SENDER INFORMATION:
         - Name: ${validatedData.sender.name}
+        - Position: ${validatedData.sender.position || 'Sales Representative'}
         - Company: ${validatedData.sender.company}
         - Product/Service: ${validatedData.sender.productDescription}
+        - Email: ${validatedData.sender.email || ''}
+        - Phone: ${validatedData.sender.phone || ''}
+        - Website: ${validatedData.sender.website || ''}
 
         RECIPIENT INFORMATION:
         - Name: ${lead.name}
         - Company: ${lead.companyName}
         ${lead.productDescription ? `- Product/Service: ${lead.productDescription}` : ''}
+        ${lead.email ? `- Email: ${lead.email}` : ''}
 
         INSTRUCTIONS:
         - Use a ${validatedData.emailSettings.tone.toLowerCase()} tone
@@ -137,6 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - Format your response as: "SUBJECT: <subject line>\n\nBODY:\n<email body>"
         - ${wordCountPrompt}
         - Personalize the email to the recipient's company and needs
+        - Include a professional signature at the end with sender's contact details
         ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
         `;
 
@@ -241,13 +247,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       SENDER INFORMATION:
       - Name: ${validatedData.sender.name}
+      - Position: ${validatedData.sender.position || 'Sales Representative'}
       - Company: ${validatedData.sender.company}
       - Product/Service: ${validatedData.sender.productDescription}
+      - Email: ${validatedData.sender.email || ''}
+      - Phone: ${validatedData.sender.phone || ''}
+      - Website: ${validatedData.sender.website || ''}
 
       RECIPIENT INFORMATION:
       - Name: ${validatedData.lead.name}
       - Company: ${validatedData.lead.companyName}
       ${validatedData.lead.productDescription ? `- Product/Service: ${validatedData.lead.productDescription}` : ''}
+      ${validatedData.lead.email ? `- Email: ${validatedData.lead.email}` : ''}
 
       INSTRUCTIONS:
       - Use a ${validatedData.emailSettings.tone.toLowerCase()} tone
@@ -255,6 +266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       - Format your response as: "SUBJECT: <subject line>\n\nBODY:\n<email body>"
       - ${wordCountPrompt}
       - Personalize the email to the recipient's company and needs
+      - Include a professional signature at the end with sender's contact details
       ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
       `;
 

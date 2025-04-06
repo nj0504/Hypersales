@@ -22,6 +22,10 @@ export const senderSchema = z.object({
   name: z.string().min(1, "Name is required"),
   company: z.string().min(1, "Company name is required"),
   productDescription: z.string().min(1, "Product description is required"),
+  email: z.string().email("Valid email is required").optional(),
+  phone: z.string().optional(),
+  website: z.string().url("Valid website URL is required").optional(),
+  position: z.string().optional(),
 });
 
 export type Sender = z.infer<typeof senderSchema>;

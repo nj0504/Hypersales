@@ -2,6 +2,10 @@ export interface Sender {
   name: string;
   company: string;
   productDescription: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  position?: string;
 }
 
 export type EmailTone = "Professional" | "Friendly" | "Casual" | "Formal";
