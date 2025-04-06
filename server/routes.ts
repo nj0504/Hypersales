@@ -151,49 +151,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
         `;
 
-        // Make API call to OpenRouter
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${openRouterApiKey}`,
-            "HTTP-Referer": process.env.REPLIT_DOMAINS || "https://localhost:5000",
-            "X-Title": "AI Email Generator"
-          },
-          body: JSON.stringify({
-            model: "qwen/qwen2.5-vl-32b-instruct:free",
-            messages: [
-              { role: "user", content: promptContent }
-            ],
-            temperature: 0.7,
-            max_tokens: 1000
-          })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`OpenRouter API error: ${JSON.stringify(errorData)}`);
+        console.log(`Making API call to OpenRouter for lead: ${lead.name}`);
+        if (openRouterApiKey) {
+          console.log(`Using API key starting with: ${openRouterApiKey.substring(0, 10)}...`);
+        } else {
+          console.error("OPENROUTER_API_KEY environment variable is not set!");
+          throw new Error("OPENROUTER_API_KEY environment variable is not set");
         }
-
-        const data = await response.json();
         
-        // Parse the AI response to extract subject and body
-        const aiResponse = data.choices[0].message.content;
+        // Make API call to OpenRouter
+        const requestBody = {
+          model: "qwen/qwen2.5-vl-32b-instruct:free",
+          messages: [
+            { role: "user", content: promptContent }
+          ],
+          temperature: 0.7,
+          max_tokens: 1000
+        };
+        
+        console.log("Request payload:", JSON.stringify(requestBody, null, 2));
         
         let subject = "";
         let body = "";
         
-        const subjectMatch = aiResponse.match(/SUBJECT:\s*(.*?)(?:\n|$)/i);
-        if (subjectMatch && subjectMatch[1]) {
-          subject = subjectMatch[1].trim();
+        try {
+          const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${openRouterApiKey}`,
+              "HTTP-Referer": process.env.REPLIT_DOMAINS || "https://localhost:5000",
+              "X-Title": "AI Email Generator"
+            },
+            body: JSON.stringify(requestBody)
+          });
+
+          console.log(`OpenRouter API response status: ${response.status}`);
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("OpenRouter API error:", errorText);
+            throw new Error(`OpenRouter API error: ${errorText}`);
+          }
+
+          const data = await response.json();
+          console.log("OpenRouter API response:", JSON.stringify(data, null, 2));
+          
+          // Parse the AI response to extract subject and body
+          const aiResponse = data.choices[0].message.content;
+          console.log(`Raw AI response for lead ${lead.name}:`, aiResponse);
+          
+          const subjectMatch = aiResponse.match(/SUBJECT:\s*(.*?)(?:\n|$)/i);
+          if (subjectMatch && subjectMatch[1]) {
+            subject = subjectMatch[1].trim();
+            console.log(`Extracted subject: "${subject}"`);
+          } else {
+            console.warn("Failed to extract subject from AI response");
+          }
+          
+          const bodyMatch = aiResponse.match(/BODY:\s*([\s\S]*)/i);
+          if (bodyMatch && bodyMatch[1]) {
+            body = bodyMatch[1].trim();
+            console.log(`Extracted body (first 50 chars): "${body.substring(0, 50)}..."`);
+          } else {
+            console.warn("Failed to extract body from AI response");
+          }
+        } catch (err) {
+          console.error("Error connecting to OpenRouter:", err);
+          throw err;
         }
         
-        const bodyMatch = aiResponse.match(/BODY:\s*([\s\S]*)/i);
-        if (bodyMatch && bodyMatch[1]) {
-          body = bodyMatch[1].trim();
-        }
-        
-        // No need to add placeholders, let the AI directly insert the values
+        // Log the email being added
+        console.log(`Adding email for ${lead.name} - subject: "${subject}", body length: ${body.length}`);
 
         // Add generated email to results
         generatedEmails.push({
@@ -230,6 +259,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // OpenRouter API integration
       const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+      if (!openRouterApiKey) {
+        console.error("OPENROUTER_API_KEY environment variable is not set!");
+        throw new Error("OPENROUTER_API_KEY environment variable is not set");
+      }
       
       // Determine word count range based on email size setting
       let wordCountPrompt = "";
@@ -277,47 +310,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
       `;
 
+      console.log(`Making API call to OpenRouter for lead: ${validatedData.lead.name}`);
+      console.log(`Using API key starting with: ${openRouterApiKey.substring(0, 10)}...`);
+        
       // Make API call to OpenRouter
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${openRouterApiKey}`,
-          "HTTP-Referer": process.env.REPLIT_DOMAINS || "https://localhost:5000",
-          "X-Title": "AI Email Generator"
-        },
-        body: JSON.stringify({
-          model: "qwen/qwen2.5-vl-32b-instruct:free",
-          messages: [
-            { role: "user", content: promptContent }
-          ],
-          temperature: 0.8, // Slightly higher temperature for more variation
-          max_tokens: 1000
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`OpenRouter API error: ${JSON.stringify(errorData)}`);
-      }
-
-      const data = await response.json();
+      const requestBody = {
+        model: "qwen/qwen2.5-vl-32b-instruct:free",
+        messages: [
+          { role: "user", content: promptContent }
+        ],
+        temperature: 0.8,
+        max_tokens: 1000
+      };
       
-      // Parse the AI response to extract subject and body
-      const aiResponse = data.choices[0].message.content;
-      
+      console.log("Request payload:", JSON.stringify(requestBody, null, 2));
+        
       let subject = "";
       let body = "";
-      
-      const subjectMatch = aiResponse.match(/SUBJECT:\s*(.*?)(?:\n|$)/i);
-      if (subjectMatch && subjectMatch[1]) {
-        subject = subjectMatch[1].trim();
+        
+      try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${openRouterApiKey}`,
+            "HTTP-Referer": process.env.REPLIT_DOMAINS || "https://localhost:5000",
+            "X-Title": "AI Email Generator"
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        console.log(`OpenRouter API response status: ${response.status}`);
+          
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("OpenRouter API error:", errorText);
+          throw new Error(`OpenRouter API error: ${errorText}`);
+        }
+
+        const data = await response.json();
+        console.log("OpenRouter API response:", JSON.stringify(data, null, 2));
+          
+        // Parse the AI response to extract subject and body
+        const aiResponse = data.choices[0].message.content;
+        console.log(`Raw AI response for lead ${validatedData.lead.name}:`, aiResponse);
+          
+        const subjectMatch = aiResponse.match(/SUBJECT:\s*(.*?)(?:\n|$)/i);
+        if (subjectMatch && subjectMatch[1]) {
+          subject = subjectMatch[1].trim();
+          console.log(`Extracted subject: "${subject}"`);
+        } else {
+          console.warn("Failed to extract subject from AI response");
+        }
+          
+        const bodyMatch = aiResponse.match(/BODY:\s*([\s\S]*)/i);
+        if (bodyMatch && bodyMatch[1]) {
+          body = bodyMatch[1].trim();
+          console.log(`Extracted body (first 50 chars): "${body.substring(0, 50)}..."`);
+        } else {
+          console.warn("Failed to extract body from AI response");
+        }
+      } catch (err) {
+        console.error("Error connecting to OpenRouter:", err);
+        throw err;
       }
-      
-      const bodyMatch = aiResponse.match(/BODY:\s*([\s\S]*)/i);
-      if (bodyMatch && bodyMatch[1]) {
-        body = bodyMatch[1].trim();
-      }
+        
+      console.log(`Generated email for ${validatedData.lead.name} - subject: "${subject}", body length: ${body.length}`);
       
       // No need to add placeholders
 

@@ -21,19 +21,47 @@ export function EmailPreview({
   const [isRegenerating, setIsRegenerating] = useState(false);
   const { toast } = useToast();
   
-  if (!emails.length) {
-    return null;
+  console.log("EmailPreview received emails:", emails);
+  
+  if (!emails || !emails.length) {
+    console.error("EmailPreview: No emails to display");
+    return (
+      <div className="mt-8 bg-white rounded-md shadow-sm border border-gray-200 p-6 text-center">
+        <h3 className="text-lg font-medium mb-4">Email Preview</h3>
+        <p className="text-red-500">No emails available to display.</p>
+        <p className="text-sm text-gray-500 mt-2">There was an issue generating emails. Please try again with different settings.</p>
+      </div>
+    );
   }
 
-  const currentEmail = emails[currentIndex];
+  // Ensure we have non-empty email data
+  const validEmails = emails.filter(email => 
+    email && email.lead && email.lead.name && email.subject && email.body
+  );
+  
+  if (!validEmails.length) {
+    console.error("EmailPreview: All emails are empty or invalid");
+    return (
+      <div className="mt-8 bg-white rounded-md shadow-sm border border-gray-200 p-6 text-center">
+        <h3 className="text-lg font-medium mb-4">Email Preview</h3>
+        <p className="text-red-500">Generated emails contain no valid content.</p>
+        <p className="text-sm text-gray-500 mt-2">The API returned empty responses. Please try again with different settings.</p>
+      </div>
+    );
+  }
+
+  // Use the filtered valid emails
+  const safeIndex = Math.min(currentIndex, validEmails.length - 1);
+  const currentEmail = validEmails[safeIndex];
+  console.log("EmailPreview displaying current email:", currentEmail);
 
   const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? emails.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? validEmails.length - 1 : prev - 1));
     if (editMode) cancelEdit();
   };
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev === emails.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === validEmails.length - 1 ? 0 : prev + 1));
     if (editMode) cancelEdit();
   };
 
@@ -195,7 +223,7 @@ export function EmailPreview({
             Previous
           </Button>
           <div className="text-sm flex items-center">
-            <span>{currentIndex + 1}</span> of <span>{emails.length}</span> emails
+            <span>{safeIndex + 1}</span> of <span>{validEmails.length}</span> emails
           </div>
           <Button
             variant="outline"

@@ -39,12 +39,65 @@ export default function Home() {
       return response.json();
     },
     onSuccess: (data) => {
+      console.log("Email generation successful, received data:", data);
+      
+      // Check for valid email data
+      if (!data || !data.emails) {
+        console.error("Invalid response from server:", data);
+        toast({
+          title: "Error generating emails",
+          description: "Server returned an invalid response. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate emails array
+      if (!Array.isArray(data.emails) || data.emails.length === 0) {
+        console.error("No emails found in response data");
+        toast({
+          title: "No emails generated",
+          description: "The server did not return any email content. Please try different settings.",
+          variant: "destructive",
+        });
+        setGeneratedEmails([]);
+        return;
+      }
+      
+      // Log the first email for debugging
+      if (data.emails[0]) {
+        console.log("First email subject:", data.emails[0].subject);
+        console.log("First email body:", data.emails[0].body);
+      }
+      
+      // Count valid emails (with non-empty content)
+      const validEmails = data.emails.filter((email: GeneratedEmail) => 
+        email && email.lead && email.lead.name && email.subject && email.body
+      );
+      
+      if (validEmails.length === 0) {
+        console.error("All emails are empty or invalid");
+        toast({
+          title: "Email generation issue",
+          description: "The API generated emails but they contain no valid content. Please try again.",
+          variant: "destructive",
+        });
+      } else if (validEmails.length < data.emails.length) {
+        toast({
+          title: "Some emails were incomplete",
+          description: `Only ${validEmails.length} out of ${data.emails.length} emails had valid content.`,
+          variant: "destructive",
+        });
+      }
+      
+      // Set emails and update UI
       setGeneratedEmails(data.emails);
       setCurrentStep(3);
       window.scrollTo({
         top: 0,
         behavior: "smooth",
       });
+      
       toast({
         title: "Emails generated successfully",
         description: `${data.emails.length} personalized emails created`,
@@ -70,10 +123,34 @@ export default function Home() {
       return response.json();
     },
     onSuccess: (data, emailIndex) => {
+      // Validate response data
+      if (!data || !data.email) {
+        console.error("Invalid response from server:", data);
+        toast({
+          title: "Error regenerating email",
+          description: "Server returned an invalid response. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate email content
+      if (!data.email.subject || !data.email.body) {
+        console.error("Empty email content in response:", data.email);
+        toast({
+          title: "Email generation issue",
+          description: "The API returned an email with empty content. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       // Update the generated email at the specified index
       const updatedEmails = [...generatedEmails];
       updatedEmails[emailIndex] = data.email;
       setGeneratedEmails(updatedEmails);
+      
+      console.log("Email regenerated successfully:", data.email);
     },
     onError: (error) => {
       toast({
