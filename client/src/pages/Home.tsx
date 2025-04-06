@@ -220,7 +220,7 @@ export default function Home() {
           onSettingsChange={handleSettingsChange} 
         />
 
-        {currentStep === 2 && leads.length > 0 && (
+        {leads.length > 0 && (
           <div className="mt-6 text-center">
             <button
               onClick={handleGenerateEmails}
