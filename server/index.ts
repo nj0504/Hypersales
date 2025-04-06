@@ -2,6 +2,21 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Check for OpenRouter API key at startup
+function checkEnvironmentVariables() {
+  const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+  if (!openRouterApiKey) {
+    console.warn("\x1b[33m%s\x1b[0m", "⚠️  WARNING: OPENROUTER_API_KEY environment variable is not set!");
+    console.warn("\x1b[33m%s\x1b[0m", "Email generation functionality will not work until an API key is provided.");
+    console.warn("\x1b[33m%s\x1b[0m", "See README.md for instructions on setting up environment variables.");
+  } else {
+    console.log("\x1b[32m%s\x1b[0m", "✅ OpenRouter API key found.");
+  }
+}
+
+// Check environment variables on startup
+checkEnvironmentVariables();
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

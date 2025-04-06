@@ -120,11 +120,23 @@ export default function Home() {
       });
     },
     onError: (error) => {
-      toast({
-        title: "Failed to generate emails",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive",
-      });
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      
+      // Special handling for missing API key
+      if (errorMessage.includes("OPENROUTER_API_KEY environment variable is not set")) {
+        toast({
+          title: "API Key Missing",
+          description: "The OpenRouter API key is not configured. If you're running this locally, please create a .env file with your OPENROUTER_API_KEY. See README.md for instructions.",
+          variant: "destructive",
+          duration: 10000, // Show for longer
+        });
+      } else {
+        toast({
+          title: "Failed to generate emails",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -182,11 +194,23 @@ export default function Home() {
       console.log("Email regenerated successfully:", data.email);
     },
     onError: (error) => {
-      toast({
-        title: "Failed to regenerate email",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
-        variant: "destructive",
-      });
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      
+      // Special handling for missing API key
+      if (errorMessage.includes("OPENROUTER_API_KEY environment variable is not set")) {
+        toast({
+          title: "API Key Missing",
+          description: "The OpenRouter API key is not configured. If you're running this locally, please create a .env file with your OPENROUTER_API_KEY. See README.md for instructions.",
+          variant: "destructive",
+          duration: 10000, // Show for longer
+        });
+      } else {
+        toast({
+          title: "Failed to regenerate email",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     },
   });
 

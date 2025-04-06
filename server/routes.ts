@@ -18,12 +18,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sample CSV download endpoint
   app.get("/api/sample-csv", (req: Request, res: Response) => {
     const sampleData = [
-      ["NAME", "COMPANY NAME", "PRODUCT DESCRIPTION", "EMAIL"],
-      ["John Doe", "ABC Company", "Enterprise IoT Solutions", "john.doe@example.com"],
-      ["Jane Smith", "XYZ Corp", "Custom Software Development", "jsmith@example.com"], 
-      ["Mike Johnson", "Acme Inc.", "Cloud Infrastructure Services", "mike@example.com"],
-      ["Sarah Williams", "Tech Innovators", "AI-Powered Analytics Platform", "sarah.w@example.com"],
-      ["Robert Chen", "DataFlow Systems", "Data Processing Solutions", "robert@example.com"],
+      ["NAME", "COMPANY NAME", "PRODUCT DESCRIPTION"],
+      ["Jane Smith", "XYZ Corp", "Software Development"],
+      ["John Doe", "ABC Inc", "Digital Marketing"],
+      ["Sarah Johnson", "123 Solutions", "Cloud Services"],
     ];
 
     const csvContent = stringify(sampleData);
@@ -102,6 +100,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // OpenRouter API integration
       const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+      
+      // Check if API key is available
+      if (!openRouterApiKey) {
+        return res.status(500).json({
+          message: "Failed to generate emails",
+          error: "OPENROUTER_API_KEY environment variable is not set"
+        });
+      }
       
       // Generate emails for each lead
       const generatedEmails: GeneratedEmail[] = [];
@@ -285,7 +291,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const openRouterApiKey = process.env.OPENROUTER_API_KEY;
       if (!openRouterApiKey) {
         console.error("OPENROUTER_API_KEY environment variable is not set!");
-        throw new Error("OPENROUTER_API_KEY environment variable is not set");
+        return res.status(500).json({
+          message: "Failed to regenerate email",
+          error: "OPENROUTER_API_KEY environment variable is not set"
+        });
       }
       
       // Determine word count range based on email size setting

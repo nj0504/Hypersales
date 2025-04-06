@@ -171,7 +171,6 @@ export function LeadsUpload({ onLeadsUploaded }: LeadsUploadProps) {
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">NAME</th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">COMPANY NAME</th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">PRODUCT DESCRIPTION</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">EMAIL</th>
               </tr>
             </thead>
             <tbody>
@@ -179,7 +178,6 @@ export function LeadsUpload({ onLeadsUploaded }: LeadsUploadProps) {
                 <td className="px-3 py-2 text-sm border-b border-gray-200">Jane Smith</td>
                 <td className="px-3 py-2 text-sm border-b border-gray-200">XYZ Corp</td>
                 <td className="px-3 py-2 text-sm border-b border-gray-200">Software Development</td>
-                <td className="px-3 py-2 text-sm border-b border-gray-200">jsmith@example.com</td>
               </tr>
             </tbody>
           </table>
