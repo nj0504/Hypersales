@@ -35,7 +35,6 @@ export function SenderForm({ onSubmit }: SenderFormProps) {
       productDescription: "",
       email: "",
       phone: "",
-      website: "",
       position: "",
     },
   });
@@ -144,7 +143,7 @@ export function SenderForm({ onSubmit }: SenderFormProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="mt-4">
               <FormField
                 control={senderForm.control}
                 name="phone"
@@ -153,20 +152,6 @@ export function SenderForm({ onSubmit }: SenderFormProps) {
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
                       <Input placeholder="+1 (555) 123-4567" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={senderForm.control}
-                name="website"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Website</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://yourcompany.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

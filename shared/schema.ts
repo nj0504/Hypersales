@@ -24,7 +24,6 @@ export const senderSchema = z.object({
   productDescription: z.string().min(1, "Product description is required"),
   email: z.string().email("Valid email is required").optional(),
   phone: z.string().optional(),
-  website: z.string().url("Valid website URL is required").optional(),
   position: z.string().optional(),
 });
 

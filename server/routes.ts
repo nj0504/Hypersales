@@ -128,7 +128,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - Product/Service: ${validatedData.sender.productDescription}
         - Email: ${validatedData.sender.email || ''}
         - Phone: ${validatedData.sender.phone || ''}
-        - Website: ${validatedData.sender.website || ''}
 
         RECIPIENT INFORMATION:
         - Name: ${lead.name}
@@ -252,7 +251,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       - Product/Service: ${validatedData.sender.productDescription}
       - Email: ${validatedData.sender.email || ''}
       - Phone: ${validatedData.sender.phone || ''}
-      - Website: ${validatedData.sender.website || ''}
 
       RECIPIENT INFORMATION:
       - Name: ${validatedData.lead.name}

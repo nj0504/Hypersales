@@ -4,7 +4,6 @@ export interface Sender {
   productDescription: string;
   email?: string;
   phone?: string;
-  website?: string;
   position?: string;
 }
 
