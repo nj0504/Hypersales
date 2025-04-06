@@ -145,7 +145,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - In the email, ALWAYS use the exact company name "${lead.companyName}" directly - DO NOT use placeholders like [Recipient's Company]
         - IMPORTANT: Do not use ANY placeholders or brackets like [Name] or [Company Name] - use the actual data
         - Make the email highly personalized to the recipient's specific needs
-        - Include a professional signature at the end with sender's contact details
+        - Include a professional signature at the end with sender's exact contact details
+        - For the signature, use ONLY the information provided (name, position, company, etc.)
+        - If email or phone is blank, simply omit them from the signature instead of using placeholders
         ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
         `;
 
@@ -269,7 +271,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       - In the email, ALWAYS use the exact company name "${validatedData.lead.companyName}" directly - DO NOT use placeholders like [Recipient's Company]
       - IMPORTANT: Do not use ANY placeholders or brackets like [Name] or [Company Name] - use the actual data
       - Make the email highly personalized to the recipient's specific needs
-      - Include a professional signature at the end with sender's contact details
+      - Include a professional signature at the end with sender's exact contact details
+      - For the signature, use ONLY the information provided (name, position, company, etc.)
+      - If email or phone is blank, simply omit them from the signature instead of using placeholders
       ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
       `;
 
