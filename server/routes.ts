@@ -119,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Build the prompt for the AI
         let promptContent = `
-        You are an expert email copywriter. Write a personalized sales email with the following details:
+        You are an expert email copywriter. Write a highly personalized sales email using the EXACT recipient data. NEVER use placeholders like [Recipient Name] or [Company]. The email MUST look like it was written specifically for this exact recipient:
 
         SENDER INFORMATION:
         - Name: ${validatedData.sender.name}
@@ -140,9 +140,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - Create both a subject line and email body
         - Format your response as: "SUBJECT: <subject line>\n\nBODY:\n<email body>"
         - ${wordCountPrompt}
-        - The subject line MUST refer to the recipient's product/service: ${lead.productDescription || "their business needs"}
-        - The email body MUST directly address the recipient by name (${lead.name}) multiple times
-        - The email body MUST mention the recipient's company name (${lead.companyName}) multiple times
+        - The subject line MUST explicitly mention the recipient's product: "${lead.productDescription || "their business needs"}"
+        - In the email, ALWAYS use the exact name "${lead.name}" directly - DO NOT use placeholders like [Recipient's Name]
+        - In the email, ALWAYS use the exact company name "${lead.companyName}" directly - DO NOT use placeholders like [Recipient's Company]
+        - IMPORTANT: Do not use ANY placeholders or brackets like [Name] or [Company Name] - use the actual data
         - Make the email highly personalized to the recipient's specific needs
         - Include a professional signature at the end with sender's contact details
         ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
@@ -242,7 +243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Build the prompt for the AI
       let promptContent = `
-      You are an expert email copywriter. Write a personalized sales email with the following details:
+      You are an expert email copywriter. Write a highly personalized sales email using the EXACT recipient data. NEVER use placeholders like [Recipient Name] or [Company]. The email MUST look like it was written specifically for this exact recipient:
 
       SENDER INFORMATION:
       - Name: ${validatedData.sender.name}
@@ -263,9 +264,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       - Create both a subject line and email body
       - Format your response as: "SUBJECT: <subject line>\n\nBODY:\n<email body>"
       - ${wordCountPrompt}
-      - The subject line MUST refer to the recipient's product/service: ${validatedData.lead.productDescription || "their business needs"}
-      - The email body MUST directly address the recipient by name (${validatedData.lead.name}) multiple times
-      - The email body MUST mention the recipient's company name (${validatedData.lead.companyName}) multiple times
+      - The subject line MUST explicitly mention the recipient's product: "${validatedData.lead.productDescription || "their business needs"}"
+      - In the email, ALWAYS use the exact name "${validatedData.lead.name}" directly - DO NOT use placeholders like [Recipient's Name]
+      - In the email, ALWAYS use the exact company name "${validatedData.lead.companyName}" directly - DO NOT use placeholders like [Recipient's Company]
+      - IMPORTANT: Do not use ANY placeholders or brackets like [Name] or [Company Name] - use the actual data
       - Make the email highly personalized to the recipient's specific needs
       - Include a professional signature at the end with sender's contact details
       ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
