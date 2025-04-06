@@ -141,6 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - Format your response as: "SUBJECT: <subject line>\n\nBODY:\n<email body>"
         - ${wordCountPrompt}
         - Personalize the email to the recipient's company and needs
+        - Use the recipient's actual name (${lead.name}) and company name (${lead.companyName}) in the email
         - Include a professional signature at the end with sender's contact details
         ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
         `;
@@ -187,16 +188,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           body = bodyMatch[1].trim();
         }
         
-        // Add placeholders for name and company in body
-        const enhancedBody = body
-          .replace(/\b(NAME)\b/gi, `{{${lead.name}}}`)
-          .replace(/\b(COMPANY)\b/gi, `{{${lead.companyName}}}`);
+        // No need to add placeholders, let the AI directly insert the values
 
         // Add generated email to results
         generatedEmails.push({
           lead,
           subject,
-          body: enhancedBody
+          body
         });
       }
 
@@ -264,6 +262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       - Format your response as: "SUBJECT: <subject line>\n\nBODY:\n<email body>"
       - ${wordCountPrompt}
       - Personalize the email to the recipient's company and needs
+      - Use the recipient's actual name (${validatedData.lead.name}) and company name (${validatedData.lead.companyName}) in the email
       - Include a professional signature at the end with sender's contact details
       ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
       `;
@@ -310,17 +309,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         body = bodyMatch[1].trim();
       }
       
-      // Add placeholders for name and company in body
-      const enhancedBody = body
-        .replace(/\b(NAME)\b/gi, `{{${validatedData.lead.name}}}`)
-        .replace(/\b(COMPANY)\b/gi, `{{${validatedData.lead.companyName}}}`);
+      // No need to add placeholders
 
       return res.status(200).json({
         message: "Email regenerated successfully",
         email: {
           lead: validatedData.lead,
           subject,
-          body: enhancedBody
+          body
         }
       });
     } catch (error) {
