@@ -59,6 +59,59 @@ export default function Home() {
     },
   });
 
+  const regenerateEmailMutation = useMutation({
+    mutationFn: async (emailIndex: number) => {
+      const lead = leads[emailIndex];
+      const response = await apiRequest(
+        "POST", 
+        "/api/regenerate-email", 
+        { sender, emailSettings, lead }
+      );
+      return response.json();
+    },
+    onSuccess: (data, emailIndex) => {
+      // Update the generated email at the specified index
+      const updatedEmails = [...generatedEmails];
+      updatedEmails[emailIndex] = data.email;
+      setGeneratedEmails(updatedEmails);
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to regenerate email",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateEmailMutation = useMutation({
+    mutationFn: async ({ index, emailData }: { index: number, emailData: Partial<GeneratedEmail> }) => {
+      const currentEmail = generatedEmails[index];
+      const updatedEmail = {
+        lead: currentEmail.lead,
+        subject: emailData.subject || currentEmail.subject,
+        body: emailData.body || currentEmail.body
+      };
+      
+      const response = await apiRequest(
+        "POST", 
+        "/api/update-email", 
+        updatedEmail
+      );
+      return { response: response.json(), index };
+    },
+    onSuccess: (data) => {
+      // Email update is handled in handleUpdateEmail
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to update email",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
+    },
+  });
+
   const exportEmailsMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest(
@@ -121,6 +174,25 @@ export default function Home() {
     generateEmailsMutation.mutate();
   };
 
+  const handleRegenerateEmail = async (index: number) => {
+    await regenerateEmailMutation.mutateAsync(index);
+  };
+
+  const handleUpdateEmail = (index: number, emailData: Partial<GeneratedEmail>) => {
+    // Update the email locally immediately for better UX
+    const updatedEmails = [...generatedEmails];
+    updatedEmails[index] = {
+      ...updatedEmails[index],
+      ...(emailData.subject && { subject: emailData.subject }),
+      ...(emailData.body && { body: emailData.body })
+    };
+    
+    setGeneratedEmails(updatedEmails);
+    
+    // Then send the update to the server
+    updateEmailMutation.mutate({ index, emailData });
+  };
+
   const handleExportEmails = () => {
     exportEmailsMutation.mutate();
   };
@@ -163,7 +235,11 @@ export default function Home() {
         {currentStep === 3 && generatedEmails.length > 0 && (
           <EmailPreview 
             emails={generatedEmails} 
-            onExport={handleExportEmails} 
+            onExport={handleExportEmails}
+            onRegenerateEmail={handleRegenerateEmail}
+            onUpdateEmail={handleUpdateEmail}
+            sender={sender}
+            emailSettings={emailSettings}
           />
         )}
       </main>

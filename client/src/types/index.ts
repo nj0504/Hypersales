@@ -33,3 +33,12 @@ export interface CSVRow {
   "PRODUCT DESCRIPTION": string;
   [key: string]: string;
 }
+
+export interface EmailPreviewProps {
+  emails: GeneratedEmail[];
+  onExport: () => void;
+  onRegenerateEmail?: (index: number) => Promise<void>;
+  onUpdateEmail?: (index: number, updatedEmail: Partial<GeneratedEmail>) => void;
+  sender?: Sender;
+  emailSettings?: EmailSettings;
+}
