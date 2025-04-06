@@ -140,8 +140,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         - Create both a subject line and email body
         - Format your response as: "SUBJECT: <subject line>\n\nBODY:\n<email body>"
         - ${wordCountPrompt}
-        - Personalize the email to the recipient's company and needs
-        - Use the recipient's actual name (${lead.name}) and company name (${lead.companyName}) in the email
+        - The subject line MUST refer to the recipient's product/service: ${lead.productDescription || "their business needs"}
+        - The email body MUST directly address the recipient by name (${lead.name}) multiple times
+        - The email body MUST mention the recipient's company name (${lead.companyName}) multiple times
+        - Make the email highly personalized to the recipient's specific needs
         - Include a professional signature at the end with sender's contact details
         ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
         `;
@@ -261,8 +263,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       - Create both a subject line and email body
       - Format your response as: "SUBJECT: <subject line>\n\nBODY:\n<email body>"
       - ${wordCountPrompt}
-      - Personalize the email to the recipient's company and needs
-      - Use the recipient's actual name (${validatedData.lead.name}) and company name (${validatedData.lead.companyName}) in the email
+      - The subject line MUST refer to the recipient's product/service: ${validatedData.lead.productDescription || "their business needs"}
+      - The email body MUST directly address the recipient by name (${validatedData.lead.name}) multiple times
+      - The email body MUST mention the recipient's company name (${validatedData.lead.companyName}) multiple times
+      - Make the email highly personalized to the recipient's specific needs
       - Include a professional signature at the end with sender's contact details
       ${validatedData.emailSettings.customPrompt ? `- Additional instructions: ${validatedData.emailSettings.customPrompt}` : ''}
       `;
