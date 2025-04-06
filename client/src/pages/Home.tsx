@@ -31,11 +31,27 @@ export default function Home() {
 
   const generateEmailsMutation = useMutation({
     mutationFn: async () => {
+      // Validate leads before sending
+      const validLeads = leads.filter(lead => 
+        lead.name && lead.name.trim() !== '' &&
+        lead.companyName && lead.companyName.trim() !== ''
+      );
+      
+      if (validLeads.length === 0) {
+        throw new Error("Your CSV file does not contain any valid leads. Each lead must have a name and company name.");
+      }
+      
       const response = await apiRequest(
         "POST", 
         "/api/generate-emails", 
-        { sender, emailSettings, leads }
+        { sender, emailSettings, leads: validLeads }
       );
+      
+      if (response.status === 400) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Invalid data: All leads must have a name and company name");
+      }
+      
       return response.json();
     },
     onSuccess: (data) => {
@@ -115,11 +131,24 @@ export default function Home() {
   const regenerateEmailMutation = useMutation({
     mutationFn: async (emailIndex: number) => {
       const lead = leads[emailIndex];
+      
+      // Validate lead data
+      if (!lead.name || lead.name.trim() === '' || 
+          !lead.companyName || lead.companyName.trim() === '') {
+        throw new Error("Cannot regenerate: Lead must have a name and company name");
+      }
+      
       const response = await apiRequest(
         "POST", 
         "/api/regenerate-email", 
         { sender, emailSettings, lead }
       );
+      
+      if (response.status === 400) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Invalid lead data: Lead must have a name and company name");
+      }
+      
       return response.json();
     },
     onSuccess: (data, emailIndex) => {

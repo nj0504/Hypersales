@@ -18,10 +18,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Sample CSV download endpoint
   app.get("/api/sample-csv", (req: Request, res: Response) => {
     const sampleData = [
-      ["NAME", "COMPANY NAME", "PRODUCT DESCRIPTION"],
-      ["Jane Smith", "XYZ Corp", "Software Development"],
-      ["John Doe", "ABC Inc", "Digital Marketing"],
-      ["Sarah Johnson", "123 Solutions", "Cloud Services"],
+      ["NAME", "COMPANY NAME", "PRODUCT DESCRIPTION", "EMAIL"],
+      ["John Doe", "ABC Company", "Enterprise IoT Solutions", "john.doe@example.com"],
+      ["Jane Smith", "XYZ Corp", "Custom Software Development", "jsmith@example.com"], 
+      ["Mike Johnson", "Acme Inc.", "Cloud Infrastructure Services", "mike@example.com"],
+      ["Sarah Williams", "Tech Innovators", "AI-Powered Analytics Platform", "sarah.w@example.com"],
+      ["Robert Chen", "DataFlow Systems", "Data Processing Solutions", "robert@example.com"],
     ];
 
     const csvContent = stringify(sampleData);
@@ -104,7 +106,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate emails for each lead
       const generatedEmails: GeneratedEmail[] = [];
       
-      for (const lead of validatedData.leads) {
+      // Filter out leads with missing required data
+      const validLeads = validatedData.leads.filter(lead => 
+        lead.name && lead.name.trim() !== '' && 
+        lead.companyName && lead.companyName.trim() !== ''
+      );
+      
+      if (validLeads.length === 0) {
+        return res.status(400).json({
+          message: "No valid leads provided",
+          error: "All leads must have a name and company name"
+        });
+      }
+      
+      for (const lead of validLeads) {
         // Determine word count range based on email size setting
         let wordCountPrompt = "";
         if (validatedData.emailSettings.size === "Short (50-100 words)") {
@@ -256,6 +271,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const validatedData = schema.parse(req.body);
+      
+      // Validate lead data 
+      if (!validatedData.lead.name || validatedData.lead.name.trim() === '' || 
+          !validatedData.lead.companyName || validatedData.lead.companyName.trim() === '') {
+        return res.status(400).json({
+          message: "Invalid lead data",
+          error: "Lead must have a name and company name"
+        });
+      }
       
       // OpenRouter API integration
       const openRouterApiKey = process.env.OPENROUTER_API_KEY;
